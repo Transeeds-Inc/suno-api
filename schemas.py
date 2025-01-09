@@ -31,18 +31,14 @@ class CustomModeGenerateParam(BaseModel):
 class DescriptionModeGenerateParam(BaseModel):
     """Generate with Song Description"""
 
-    gpt_description_prompt: str
+    prompt: str
     make_instrumental: bool = False
     mv: str = Field(
         default="chirp-v4",
         description="model version, default: chirp-v4",
         examples=["chirp-v4"],
     )
-
-    prompt: str = Field(
-        default="",
-        description="Placeholder, keep it as an empty string, do not modify it",
-    )
+    title: str = Field(..., description="song title")
 
 
 class ConcatParam(BaseModel):
@@ -51,6 +47,24 @@ class ConcatParam(BaseModel):
     clip_id: str
     is_infill: bool = False
 
-
 class GenerateLyricsParam(BaseModel):
     prompt: str = Field(..., description="lyrics")
+
+class ExtendParam(BaseModel):
+    """Extend a song"""
+
+    prompt: str
+    make_instrumental: bool = False
+    mv: str = Field(
+        default="chirp-v4",
+        description="model version, default: chirp-v4",
+        examples=["chirp-v4"],
+    )
+    title: str = Field(..., description="song title")
+    style: str = Field(..., description="style of music")
+    audio_id: str
+    continue_at: Optional[float] = Field(
+        default=None,
+        description="continue a new clip from a previous song, format number",
+        examples=[120],
+    )

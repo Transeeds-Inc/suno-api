@@ -5,8 +5,13 @@ from loguru import logger
 from cache import cache
 import asyncio
 
+from dotenv import load_dotenv
+load_dotenv()
+
 BASE_URL = "https://api.acedata.cloud/suno"
 TOKEN = os.getenv("TOKEN")
+if not TOKEN:
+    raise Exception("TOKEN environment variable is not set. Please check your .env file.")
 
 
 COMMON_HEADERS = {
@@ -73,24 +78,40 @@ async def generate_music_with_lyrics(data, token):
 
 
 async def generate_music_with_prompt(data, token):
-    headers = {"Authorization": f"Bearer {token}"}
     api_url = f"{BASE_URL}/audios"
     payload = {
         "action": "generate",
+        "prompt": data["prompt"],
         "model": data["mv"],
-        "prompt": data["gpt_description_prompt"],
         "custom": False,
-        "callback_url": "true",
+        "instrumental": data["make_instrumental"],
+        "title": data["title"],
+        "callback_url": "",
     }
-    response = await fetch(api_url, headers, payload)
-    res = await get_clip_id(response, token)
-    if res:
-        return res
-    return {"detail": "timeout"}
+    response = await fetch(api_url, None, payload)
+    return response
 
 
 async def concat_music(data, token):
     raise NotImplementedError
+
+
+async def extend_music(data, token):
+    api_url = f"{BASE_URL}/audios"
+    payload = {
+        "action": "extend",
+        "prompt": data["prompt"],
+        "model": data["mv"],
+        "custom": True,
+        "instrumental": data["make_instrumental"],
+        "title": data["title"],
+        "style": data["style"],
+        "audio_id": data["audio_id"],
+        "continue_at": data["continue_at"],
+        "callback_url": "",
+    }
+    response = await fetch(api_url, None, payload)
+    return response
 
 
 async def generate_lyrics(prompt, token):
