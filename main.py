@@ -1,22 +1,21 @@
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 
 import schemas
 from deps import get_token
 from utils import (
-    generate_lyrics,
-    generate_music_with_prompt,
-    generate_music_with_lyrics,
-    get_feed_by_clip_id,
-    get_lyrics,
     concat_music,
     extend_music,
+    generate_lyrics,
+    generate_music_with_lyrics,
+    generate_music_with_prompt,
+    get_feed_by_clip_id,
+    get_lyrics,
 )
 
-
 app = FastAPI()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -103,6 +102,7 @@ async def concat(data: schemas.ConcatParam, token: str = Depends(get_token)):
             detail=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
 @app.post("/generate/extend")
 async def extend(data: schemas.ExtendParam, token: str = Depends(get_token)):
     try:
@@ -113,6 +113,8 @@ async def extend(data: schemas.ExtendParam, token: str = Depends(get_token)):
             detail=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
+handler = Mangum(app)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,6 +1,8 @@
 aiohttp
 fastapi
-uvicorn
-pydantic
-requests
 loguru
+mangum
+pydantic
+python-dotenv
+requests
+uvicorn
